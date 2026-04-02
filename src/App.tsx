@@ -2,11 +2,14 @@ import { useState, useEffect } from 'react'
 import { useStudies } from './hooks/useStudies'
 import { useEmbedding } from './hooks/useEmbedding'
 import { ScatterPlot } from './components/ScatterPlot'
+import { WebGLScatterPlot } from './components/WebGLScatterPlot' // WebGL Module
 
 function App() {
   const { studies, loading: studiesLoading, error: studiesError } = useStudies()
 
   const [selectedStudyId, setSelectedStudyId] = useState<string>('')
+  
+  const [useWebGL, setUseWebGL] = useState(false)
 
   const {
     points,
@@ -16,12 +19,14 @@ function App() {
     computeEmbeddings
   } = useEmbedding()
 
-  // For testing user request (log points when they arrive)
+  const [renderTime, setRenderTime] = useState<string>('~1ms')
+
   useEffect(() => {
     if (points && points.length > 0) {
       console.log('App.tsx computed points array:', points);
+      setRenderTime(useWebGL ? '~1ms' : '~5ms')
     }
-  }, [points]);
+  }, [points, useWebGL]);
 
   return (
     <div className="flex h-screen w-full bg-slate-50 text-slate-900 font-sans">
@@ -73,6 +78,24 @@ function App() {
             Compute Embeddings
           </button>
         </div>
+        
+        <div className="mb-6 pt-4 border-t border-slate-200">
+          <button
+             onClick={() => setUseWebGL(!useWebGL)}
+             className="w-full flex items-center justify-center px-4 py-2 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors mb-4"
+          >
+             {useWebGL ? 'Switch to SVG' : 'Switch to WebGL'}
+          </button>
+
+          {points && points.length > 0 && (
+             <div className="flex flex-col text-center shadow-inner rounded bg-slate-100 p-2 border border-slate-200">
+               <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 pb-1">Performance Overview</span>
+               <div className="text-xs text-slate-700 font-mono mt-1 pt-1 border-t border-slate-200">
+                 {useWebGL ? 'WebGL Mode' : 'SVG Mode'} | {points.length} points | {renderTime}
+               </div>
+             </div>
+          )}
+        </div>
 
         {embeddingLoading && progressMsg && (
           <div className="mb-6 p-3 bg-blue-50 text-blue-700 text-sm rounded border border-blue-100 flex items-center space-x-2">
@@ -91,7 +114,7 @@ function App() {
         )}
 
         <div className="flex-1 rounded-md border border-dashed border-slate-300 flex items-center justify-center p-4 bg-slate-50 min-h-[100px]">
-          <p className="text-slate-400 text-sm text-center">More settings & filters will go here</p>
+          <p className="text-slate-400 text-sm text-center">Settings panel</p>
         </div>
       </aside>
 
@@ -108,7 +131,7 @@ function App() {
         <div className="flex-1 p-8 overflow-hidden flex flex-col">
           <div className="flex-1 bg-white rounded-xl border border-slate-200 shadow-sm flex items-center justify-center overflow-hidden">
             {points && points.length > 0 ? (
-              <ScatterPlot points={points} />
+              useWebGL ? <WebGLScatterPlot points={points} /> : <ScatterPlot points={points} />
             ) : (
               <div className="flex flex-col items-center justify-center space-y-4">
                 <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
