@@ -31,7 +31,7 @@ function App() {
   return (
     <div className="flex h-screen w-full bg-slate-50 text-slate-900 font-sans">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-slate-200 px-4 py-6 flex flex-col shrink-0 drop-shadow-sm z-10 overflow-y-auto">
+      <aside className="w-64 bg-[#f7fafc] border-r border-slate-200 px-4 py-6 flex flex-col shrink-0 drop-shadow-sm z-10 overflow-y-auto">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500 mb-6">
           Controls
         </h2>
@@ -121,16 +121,35 @@ function App() {
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center px-8 shrink-0">
-          <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-            cBioPortal Embedding Similarity Dashboard
-          </h1>
+        <header className="py-3 bg-[#1a365d] border-b border-slate-200 flex flex-col justify-center px-8 shrink-0 text-white">
+          <div className="flex items-center space-x-3">
+            <h1 className="text-xl font-bold">
+              cBioPortal Embedding Similarity Dashboard
+            </h1>
+            <div className="group relative flex items-center justify-center w-5 h-5 rounded-full bg-white/20 text-xs font-bold cursor-help">
+              i
+              <div className="absolute left-full mt-2 ml-2 w-64 p-3 bg-slate-800 text-slate-100 text-xs rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
+                UMAP (Uniform Manifold Approximation and Projection) is a robust dimension reduction algorithm. Like t-SNE, it allows algorithms to visualize complex geometric similarities natively in 2D space.
+              </div>
+            </div>
+          </div>
+          <p className="text-sm text-blue-200 mt-0.5">Visualizing cancer genomic embeddings with UMAP</p>
         </header>
 
         {/* Plot Placeholder */}
         <div className="flex-1 p-8 overflow-hidden flex flex-col">
-          <div className="flex-1 bg-white rounded-xl border border-slate-200 shadow-sm flex items-center justify-center overflow-hidden">
-            {points && points.length > 0 ? (
+          <div className="flex-1 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center overflow-hidden relative">
+            {embeddingLoading ? (
+              <div className="flex flex-col items-center justify-center space-y-4 my-auto">
+                <svg className="animate-spin h-10 w-10 text-[#1a365d]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <div className="text-center">
+                  <p className="text-[#1a365d] font-semibold text-lg animate-pulse">{progressMsg || "Fetching data..."}</p>
+                </div>
+              </div>
+            ) : points && points.length > 0 ? (
               useWebGL ? <WebGLScatterPlot points={points} /> : <ScatterPlot points={points} />
             ) : (
               <div className="flex flex-col items-center justify-center space-y-4">
@@ -143,6 +162,13 @@ function App() {
             )}
           </div>
         </div>
+        
+        {/* Footer */}
+        <footer className="h-10 bg-[#f7fafc] border-t border-slate-200 flex items-center justify-center shrink-0">
+          <p className="text-xs font-medium text-slate-500 uppercase tracking-widest">
+            Built for GSoC 2026 <span className="opacity-50 mx-1">|</span> cBioPortal
+          </p>
+        </footer>
       </main>
     </div>
   )

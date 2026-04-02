@@ -1,73 +1,38 @@
-# React + TypeScript + Vite
+# cBioPortal Embedding Similarity Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Overview
+An interactive dashboard for visualizing high-dimensional cancer 
+genomic data embeddings using UMAP/t-SNE dimensionality reduction.
+Built as part of GSoC 2026 proposal for cBioPortal.
 
-Currently, two official plugins are available:
+## Features
+- Real-time data fetching from cBioPortal public API
+- UMAP dimensionality reduction of genomic expression data
+- Interactive D3.js scatter plot with zoom, pan, and hover
+- WebGL rendering mode for high-performance visualization
+- Cancer study selector with 200+ studies
+- sample-level tooltips with genomic details
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Tech Stack
+- React + TypeScript + Vite
+- D3.js for SVG visualization
+- umap-js for dimensionality reduction
+- WebGL / regl for GPU-accelerated rendering
+- Axios for cBioPortal REST API integration
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Getting Started
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## How It Works
+1. Select a cancer study from the dropdown
+2. Click "Compute Embeddings"
+3. UMAP reduces gene expression matrix to 2D
+4. Each dot represents one cancer sample
+5. Similar samples cluster together
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Related
+- GSoC 2026 Issue #141: Enhance Similarity Maps
+- cBioPortal: https://www.cbioportal.org
