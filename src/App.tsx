@@ -1,12 +1,30 @@
-
+import { useState, useEffect } from 'react'
 import { useStudies } from './hooks/useStudies'
+import { useEmbedding } from './hooks/useEmbedding'
 
 function App() {
-  const { studies, loading, error } = useStudies()
+  const { studies, loading: studiesLoading, error: studiesError } = useStudies()
+  
+  const [selectedStudyId, setSelectedStudyId] = useState<string>('')
+  
+  const { 
+    points, 
+    loading: embeddingLoading, 
+    error: embeddingError, 
+    progressMsg, 
+    computeEmbeddings 
+  } = useEmbedding()
+
+  // For testing user request (log points when they arrive)
+  useEffect(() => {
+    if (points.length > 0) {
+      console.log('UMAP Points computed:', points);
+    }
+  }, [points]);
 
   return (
     <div className="flex h-screen w-full bg-slate-50 text-slate-900 font-sans">
-      {/* Sidebar Placeholder */}
+      {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-slate-200 px-4 py-6 flex flex-col shrink-0 drop-shadow-sm z-10 overflow-y-auto">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500 mb-6">
           Controls
@@ -16,7 +34,7 @@ function App() {
           <label htmlFor="study-select" className="block text-sm font-medium text-slate-700 mb-2">
             Cancer Study
           </label>
-          {loading ? (
+          {studiesLoading ? (
             <div className="flex items-center space-x-2 text-sm text-slate-500">
               <svg className="animate-spin h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -24,15 +42,16 @@ function App() {
               </svg>
               <span>Loading studies...</span>
             </div>
-          ) : error ? (
+          ) : studiesError ? (
             <div className="text-sm text-red-500 bg-red-50 p-3 rounded border border-red-200 shadow-sm leading-tight text-left">
-              {error}
+              {studiesError}
             </div>
           ) : (
             <select
               id="study-select"
               className="w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm bg-white border px-3 py-2 text-slate-700"
-              defaultValue=""
+              value={selectedStudyId}
+              onChange={(e) => setSelectedStudyId(e.target.value)}
             >
               <option value="" disabled>Select a study...</option>
               {studies.map((study) => (
@@ -43,6 +62,32 @@ function App() {
             </select>
           )}
         </div>
+
+        <div className="mb-6">
+          <button
+            onClick={() => computeEmbeddings(selectedStudyId)}
+            disabled={!selectedStudyId || embeddingLoading}
+            className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors"
+          >
+            Compute Embeddings
+          </button>
+        </div>
+        
+        {embeddingLoading && progressMsg && (
+           <div className="mb-6 p-3 bg-blue-50 text-blue-700 text-sm rounded border border-blue-100 flex items-center space-x-2">
+              <svg className="animate-spin h-4 w-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span>{progressMsg}</span>
+           </div>
+        )}
+        
+        {embeddingError && (
+           <div className="mb-6 p-3 bg-red-50 text-red-700 text-sm rounded border border-red-200">
+             {embeddingError}
+           </div>
+        )}
 
         <div className="flex-1 rounded-md border border-dashed border-slate-300 flex items-center justify-center p-4 bg-slate-50 min-h-[100px]">
           <p className="text-slate-400 text-sm text-center">More settings & filters will go here</p>
@@ -61,13 +106,23 @@ function App() {
         {/* Plot Placeholder */}
         <div className="flex-1 p-8 overflow-hidden flex flex-col">
           <div className="flex-1 bg-white rounded-xl border border-slate-200 shadow-sm flex items-center justify-center overflow-hidden">
-            <div className="flex flex-col items-center justify-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
-                <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+            {points.length > 0 ? (
+              <div className="flex flex-col items-center justify-center space-y-4">
+                 <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center">
+                   <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                 </div>
+                 <p className="text-slate-700 font-medium text-lg">UMAP Details Computed</p>
+                 <p className="text-slate-500 text-sm">Successfully computed {points.length} embeddings. Check console for points array.</p>
               </div>
-              <p className="text-slate-500 font-medium">Embedding Visualization Plot</p>
-              <p className="text-slate-400 text-sm max-w-sm text-center">The D3.js and UMAP powered visualization will be rendered in this area.</p>
-            </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center space-y-4">
+                <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
+                  <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                </div>
+                <p className="text-slate-500 font-medium">Embedding Visualization Plot</p>
+                <p className="text-slate-400 text-sm max-w-sm text-center">The D3.js and UMAP powered visualization will be rendered in this area.</p>
+              </div>
+            )}
           </div>
         </div>
       </main>

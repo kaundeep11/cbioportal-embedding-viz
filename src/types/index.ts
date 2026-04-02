@@ -22,3 +22,11 @@ export interface MolecularData {
   entrezGeneId: number;
   value: number;
 }
+
+export interface MolecularProfile {
+  molecularProfileId: string;
+  name: string;
+  molecularAlterationType: string;
+  datatype: string;
+  studyId: string;
+}
