@@ -1,24 +1,25 @@
 import { useState, useEffect } from 'react'
 import { useStudies } from './hooks/useStudies'
 import { useEmbedding } from './hooks/useEmbedding'
+import { ScatterPlot } from './components/ScatterPlot'
 
 function App() {
   const { studies, loading: studiesLoading, error: studiesError } = useStudies()
-  
+
   const [selectedStudyId, setSelectedStudyId] = useState<string>('')
-  
-  const { 
-    points, 
-    loading: embeddingLoading, 
-    error: embeddingError, 
-    progressMsg, 
-    computeEmbeddings 
+
+  const {
+    points,
+    loading: embeddingLoading,
+    error: embeddingError,
+    progressMsg,
+    computeEmbeddings
   } = useEmbedding()
 
   // For testing user request (log points when they arrive)
   useEffect(() => {
-    if (points.length > 0) {
-      console.log('UMAP Points computed:', points);
+    if (points && points.length > 0) {
+      console.log('App.tsx computed points array:', points);
     }
   }, [points]);
 
@@ -29,7 +30,7 @@ function App() {
         <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500 mb-6">
           Controls
         </h2>
-        
+
         <div className="mb-6 flex-shrink-0">
           <label htmlFor="study-select" className="block text-sm font-medium text-slate-700 mb-2">
             Cancer Study
@@ -72,21 +73,21 @@ function App() {
             Compute Embeddings
           </button>
         </div>
-        
+
         {embeddingLoading && progressMsg && (
-           <div className="mb-6 p-3 bg-blue-50 text-blue-700 text-sm rounded border border-blue-100 flex items-center space-x-2">
-              <svg className="animate-spin h-4 w-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <span>{progressMsg}</span>
-           </div>
+          <div className="mb-6 p-3 bg-blue-50 text-blue-700 text-sm rounded border border-blue-100 flex items-center space-x-2">
+            <svg className="animate-spin h-4 w-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span>{progressMsg}</span>
+          </div>
         )}
-        
+
         {embeddingError && (
-           <div className="mb-6 p-3 bg-red-50 text-red-700 text-sm rounded border border-red-200">
-             {embeddingError}
-           </div>
+          <div className="mb-6 p-3 bg-red-50 text-red-700 text-sm rounded border border-red-200">
+            {embeddingError}
+          </div>
         )}
 
         <div className="flex-1 rounded-md border border-dashed border-slate-300 flex items-center justify-center p-4 bg-slate-50 min-h-[100px]">
@@ -106,14 +107,8 @@ function App() {
         {/* Plot Placeholder */}
         <div className="flex-1 p-8 overflow-hidden flex flex-col">
           <div className="flex-1 bg-white rounded-xl border border-slate-200 shadow-sm flex items-center justify-center overflow-hidden">
-            {points.length > 0 ? (
-              <div className="flex flex-col items-center justify-center space-y-4">
-                 <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center">
-                   <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                 </div>
-                 <p className="text-slate-700 font-medium text-lg">UMAP Details Computed</p>
-                 <p className="text-slate-500 text-sm">Successfully computed {points.length} embeddings. Check console for points array.</p>
-              </div>
+            {points && points.length > 0 ? (
+              <ScatterPlot points={points} />
             ) : (
               <div className="flex flex-col items-center justify-center space-y-4">
                 <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
